@@ -59,33 +59,67 @@
         <audio preload="auto" class="light-on" src="resources/audio/BallastHumMedium2.wav"></audio>
         <audio preload="auto" class="door-sound" src="resources/audio/SFXBible_12478.wav"></audio>
         <audio preload="auto" class="door-light-disabled" src="resources/audio/error.wav"></audio>
-        <!-- Left Door Switch-->
-        <div class="left to-hide">
-            <div class="left-door">
-                <img src="resources/img/doors/left_door_1.png" class="default" alt="">
-            </div>
-            <div class="left-switch">
-                <img src="resources/img/rooms/left_switch_door_0_light_0.png" alt="" usemap="left-door-switch">
-                <map name="left-door-switch">
-                    <area target="" alt="Door Switch" title="Door Switch" href="javascript:toggleLeftDoor();" coords="31,107,69,53" shape="rect">
-                    <area target="" id="left-light-toggle" alt="Light Switch" title="Light Switch (Hold to On)" href="javascript:;" coords="70,187,31,134" shape="rect">
-                </map>
+       <!-- Left Door & Switch -->
+<div class="left to-hide">
+    <div class="left-door">
+        <img src="resources/img/doors/left_door_1.png" class="default" alt="Left door">
+    </div>
+    <div class="left-switch">
+        <img 
+            src="resources/img/rooms/left_switch_door_0_light_0.png" 
+            alt="Left switch panel" 
+            usemap="#left-door-switch"
+        >
+        <map name="left-door-switch" id="left-door-switch">
+            <area 
+                alt="Door Switch" 
+                title="Toggle left door" 
+                href="javascript:toggleLeftDoor();" 
+                coords="31,53,69,107" 
+                shape="rect"
+            >
+            <area 
+                id="left-light-toggle" 
+                alt="Light Switch" 
+                title="Light Switch (Hold to On)" 
+                href="javascript:;" 
+                coords="31,134,69,187" 
+                shape="rect"
+            >
+        </map>
+    </div>
+</div>
 
-            </div>
-        </div>
-        <!--  Right Door Switch-->
-        <div class="right to-hide">
-            <div class="right-door">
-                <img src="resources/img/doors/right_door_1.png" alt="">
-            </div>
-            <div class="right-switch">
-                <img src="resources/img/rooms/right_switch_door_0_light_0.png" alt="" usemap="right-door-switch">
-                <map name="right-door-switch">
-                    <area target="" alt="Door Switch" title="Door Switch" href="javascript:toggleRightDoor();" coords="24,53,62,107" shape="rect">
-                    <area target="" id="right-light-toggle" alt="Light Switch" title="Light Switch (Hold to On)" href="javascript:;" coords="23,133,63,187" shape="rect">
-                </map>
-            </div>
-        </div>
+<!-- Right Door & Switch -->
+<div class="right to-hide">
+    <div class="right-door">
+        <img src="resources/img/doors/right_door_1.png" alt="Right door">
+    </div>
+    <div class="right-switch">
+        <img 
+            src="resources/img/rooms/right_switch_door_0_light_0.png" 
+            alt="Right switch panel" 
+            usemap="#right-door-switch"
+        >
+        <map name="right-door-switch" id="right-door-switch">
+            <area 
+                alt="Door Switch" 
+                title="Toggle right door" 
+                href="javascript:toggleRightDoor();" 
+                coords="24,53,62,107" 
+                shape="rect"
+            >
+            <area 
+                id="right-light-toggle" 
+                alt="Light Switch" 
+                title="Light Switch (Hold to On)" 
+                href="javascript:;" 
+                coords="23,133,63,187" 
+                shape="rect"
+            >
+        </map>
+    </div>
+</div>
 
         <!-- Camera Menu-->
         <!-- camera animation -->
