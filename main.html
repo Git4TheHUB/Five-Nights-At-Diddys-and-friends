@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Five Nights at Diddy's</title>
+    <link href="//fonts.googleapis.com/css?family=Press+Start+2P&subset=latin,greek" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" href="stylesheets/main.css">
+</head>
+<body>
+    <audio preload="auto" id="game-start" src="resources/audio/Buzz_Fan_Florescent2.wav" loop="loop" volume="0.1"></audio>
+    <audio preload="auto" id="call1" src="resources/audio/voiceover1.wav"></audio>
+    <audio preload="auto" id="call2" src="resources/audio/voiceover2.wav"></audio>
+    <audio preload="auto" id="call3" src="resources/audio/voiceover3.wav"></audio>
+    <audio preload="auto" id="call4" src="resources/audio/voiceover4.wav"></audio>
+    <audio preload="auto" id="call5" src="resources/audio/voiceover5.wav"></audio>
+    <audio preload="auto" id="ambience2" src="resources/audio/ambience2.wav" loop="loop" volume="0.5"></audio>
+    <audio preload="auto" id="window-scare" src="resources/audio/windowscare.wav"></audio>
+    <audio preload="auto" id="scare" src="resources/audio/XSCREAM.wav"></audio>
+    <audio preload="auto" id="powerout-sound" src="resources/audio/powerdown.wav"></audio>
+    <audio preload="auto" id="powerout-jingle" src="resources/audio/music box.wav" loop="loop"></audio>
+    <audio preload="auto" id="gameover-static" src="resources/audio/static.wav"></audio>
+    <audio preload="auto" id="move-sound" src="resources/audio/deep steps.wav"></audio>
+    <audio preload="auto" id="win-sound" src="resources/audio/chimes 2.wav"></audio>
+    <audio preload="auto" id="win-cheer" src="resources/audio/CROWD_SMALL_CHIL_EC049202.wav"></audio>
+
+    <audio preload="auto" id="kitchen-b" src="resources/audio/OVEN-DRA_1_GEN-HDF18119.wav"></audio>
+    <audio preload="auto" id="kitchen-c" src="resources/audio/OVEN-DRA_2_GEN-HDF18120.wav"></audio>
+    <audio preload="auto" id="kitchen-f" src="resources/audio/OVEN-DRA_7_GEN-HDF18121.wav"></audio>
+
+    <div class="transition">
+        <img src="resources/img/game/transition_screen.png" alt="">
+        <h2 class="display-0" id="transition-start">12:00 AM</h2>
+        <h2 class="display-0" id="transition-night">Night <span id="night-count">1</span></h2>
+    </div>
+
+    <div class="preloader">
+        <img src="resources/img/game/preloader.png" alt="">
+    </div>
+
+    <div class="container">
+
+        <div class="background">
+            <a href="javascript:;" class="to-hide" onclick="muteCall()"><img class="mute-call" src="resources/img/game/mute_call.png" alt=""></a>
+            <img class="main-screen" src="resources/img/rooms/safe_room/safe_room_left_light_0_right_light_0.png" style="height: 100vh; width: 100vw; background-size: cover; background-repeat: no-repeat;">
+            <img id="spinning-fan" class="to-hide" src="resources/img/game/spinning_fan.gif">
+        </div>
+
+        <div class="top-menu to-hide">
+            <h2 class="show-hour"><span id="hour-counter">12</span> AM</h2>
+            <h2 class="show-night">Night <span id="night-counter">1</span></h2>
+        </div>
+
+        <audio preload="auto" class="light-on" src="resources/audio/BallastHumMedium2.wav"></audio>
+        <audio preload="auto" class="door-sound" src="resources/audio/SFXBible_12478.wav"></audio>
+        <audio preload="auto" class="door-light-disabled" src="resources/audio/error.wav"></audio>
+
+        <!-- Left Door & Switch -->
+        <div class="left to-hide">
+            <div class="left-door">
+                <img src="resources/img/doors/left_door_1.png" class="default" alt="Left door">
+            </div>
+            <div class="left-switch">
+                <img src="resources/img/rooms/left_switch_door_0_light_0.png" alt="Left switch panel" usemap="#left-door-switch">
+                <map name="left-door-switch" id="left-door-switch">
+                    <area alt="Door Switch" title="Toggle left door" href="javascript:toggleLeftDoor();" coords="31,53,69,107" shape="rect">
+                    <area id="left-light-toggle" alt="Light Switch" title="Light Switch (Hold to On)" href="javascript:;" coords="31,134,69,187" shape="rect">
+                </map>
+            </div>
+        </div>
+
+        <!-- Right Door & Switch -->
+        <div class="right to-hide">
+            <div class="right-door">
+                <img src="resources/img/doors/right_door_1.png" alt="Right door">
+            </div>
+            <div class="right-switch">
+                <img src="resources/img/rooms/right_switch_door_0_light_0.png" alt="Right switch panel" usemap="#right-door-switch">
+                <map name="right-door-switch" id="right-door-switch">
+                    <area alt="Door Switch" title="Toggle right door" href="javascript:toggleRightDoor();" coords="24,53,62,107" shape="rect">
+                    <area id="right-light-toggle" alt="Light Switch" title="Light Switch (Hold to On)" href="javascript:;" coords="23,133,63,187" shape="rect">
+                </map>
+            </div>
+        </div>
+
+        <!-- Camera Menu -->
+        <div class="camera-menu">
+            <div id="camera-record"><img src="resources/img/cams/record_button.png" alt=""></div>
+            <div id="camera-bg1"><img src="" alt=""></div>
+            <div id="camera-bg3"><img src="resources/img/cams/camera_screen.png" alt=""></div>
+            <p id="camera-id">Showstage</p>
+            <img id="cameras" src="resources/img/game/camera_map.png">
+            <div class="static"></div>
+            <ul>
+                <li class="active"><a href="javascript:;" data-camname="Showstage" id="cam1a">CAM<br>1A<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="Dining Area" id="cam1b">CAM<br>1B<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="Backstage" id="cam5">CAM<br>5<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="Pirate Cove" id="cam1c">CAM<br>1C<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="Supply Closet" id="cam3">CAM<br>3<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="West Hall" id="cam2a">CAM<br>2A<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="West Hall Corner" id="cam2b">CAM<br>2B<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="East Hall Corner" id="cam4b">CAM<br>4B<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="East Hall" id="cam4a">CAM<br>4A<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="Kitchen" id="cam6">CAM<br>6<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+                <li><a href="javascript:;" data-camname="Rest Rooms" id="cam7">CAM<br>7<audio preload="auto" class="camera-cycle" src="resources/audio/blip3.wav"></audio></a></li>
+            </ul>
+        </div>
+
+        <div id="camera-bg2"><img src="" alt="" class="display-0"></div>
+
+        <div class="control to-hide">
+            <div class="control-usage">
+                <p class="power">Power left: <span id="power-counter">100</span>%</p>
+                <p class="usage">Usage: <span id="usage-counter"><img src="resources/img/game/batt_usage_1.png" alt=""></span></p>
+            </div>
+            <a href="javascript:;" onclick="cameraState();"><img id="toggle-camera" src="resources/img/game/camera_toggle.png"><audio preload="auto" class="camera-toggle" src="resources/audio/CAMERA_VIDEO_LOA_60105303.wav"></audio></a>
+        </div>
+    </div>
+
+    <script type="text/javascript" src="js/jquery-2.2.4.js"></script>
+    <script type="text/javascript" src="js/scratch-js.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+    <script>
+        var getNight = parseInt(localStorage.getItem('night'));
+        var night = getNight || 1;
+        $('#night-counter').html(night);
+
+        if (night <= 1) {
+            setTimeout(function() {
+                $('#call'+night).get(0).play();
+                $('.mute-call').fadeIn();
+            }, 27000);
+        }
+        if (night >= 2 && night < 6) {
+            setTimeout(function() {
+                $('#call'+night).get(0).play();
+                $('.mute-call').fadeIn();
+            }, 4000);
+        }
+
+        // GAMEPAD SUPPORT
+        var gameOver = false;  // Detected via audio play events below
+
+        // Alternative to app.js: detect game over by listening to scare/powerout/gameover audio play
+        document.getElementById('scare').addEventListener('play', function() {
+            gameOver = true;
+        });
+        document.getElementById('powerout-sound').addEventListener('play', function() {
+            gameOver = true;
+        });
+        document.getElementById('gameover-static').addEventListener('play', function() {
+            gameOver = true;
+        });
+
+        // Optional: reset on new night transition (if page doesn't reload)
+        $('.transition').on('show', function() {  // assuming it has show event, or replace with visibility check
+            gameOver = false;
+        });
+
+        let prevButtons = {};
+        let prevAxes = {};
+
+        function isJoyCon(gp) {
+            if (!gp) return false;
+            const id = gp.id.toLowerCase();
+            return id.includes('joy-con') || id.includes('switch') || id.includes('057e');
+        }
+
+        function getCameraLinks() {
+            return $('.camera-menu ul li a');
+        }
+
+        function nextCamera() {
+            const links = getCameraLinks();
+            if (links.length < 1) return;
+            let idx = -1;
+            links.each(function(i) {
+                if ($(this).parent().hasClass('active')) idx = i;
+            });
+            if (idx === -1) return;
+            const next = (idx + 1) % links.length;
+            links.eq(next).trigger('click');
+        }
+
+        function prevCamera() {
+            const links = getCameraLinks();
+            if (links.length < 1) return;
+            let idx = -1;
+            links.each(function(i) {
+                if ($(this).parent().hasClass('active')) idx = i;
+            });
+            if (idx === -1) return;
+            const prev = (idx - 1 + links.length) % links.length;
+            links.eq(prev).trigger('click');
+        }
+
+        function pollGamepads() {
+            const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
+
+            // Aggregate inputs from all Joy-Cons (in case left/right separate)
+            let aggregated = {
+                buttons: new Array(16).fill(false),
+                axes: new Array(4).fill(0)
+            };
+
+            for (let i = 0; i < gamepads.length; i++) {
+                const gp = gamepads[i];
+                if (!gp || !isJoyCon(gp)) continue;
+
+                for (let b = 0; b < gp.buttons.length; b++) {
+                    if (gp.buttons[b].pressed) aggregated.buttons[b] = true;
+                }
+                for (let a = 0; a < gp.axes.length; a++) {
+                    if (Math.abs(gp.axes[a]) > 0.1) aggregated.axes[a] = gp.axes[a];
+                }
+            }
+
+            const gp = aggregated;  // use aggregated for checks
+            const idx = 'agg';  // single key for prev
+            if (!prevButtons[idx]) {
+                prevButtons[idx] = new Array(16).fill(false);
+                prevAxes[idx] = new Array(4).fill(0);
+            }
+
+            const pBtns = prevButtons[idx];
+            const pAxes = prevAxes[idx];
+
+            if (gameOver) {
+                // Reset prev to avoid post-death triggers
+                for (let b = 0; b < gp.buttons.length; b++) pBtns[b] = gp.buttons[b];
+                for (let a = 0; a < gp.axes.length; a++) pAxes[a] = gp.axes[a];
+                requestAnimationFrame(pollGamepads);
+                return;
+            }
+
+            // ─── ZL (left trigger, button 6) → toggle left door ──
+            if (gp.buttons[6] && !pBtns[6]) {
+                toggleLeftDoor();
+            }
+
+            // ─── ZR (right trigger, button 7) → toggle right door ──
+            if (gp.buttons[7] && !pBtns[7]) {
+                toggleRightDoor();
+            }
+
+            // ─── Hold L (left bumper, button 4) → left light on ──
+            if (gp.buttons[4]) {
+                if (!pBtns[4]) {
+                    $('#left-light-toggle').trigger('mousedown');  // start hold
+                }
+            } else if (pBtns[4]) {
+                $('#left-light-toggle').trigger('mouseup');  // release
+            }
+
+            // ─── Hold R (right bumper, button 5) → right light on ──
+            if (gp.buttons[5]) {
+                if (!pBtns[5]) {
+                    $('#right-light-toggle').trigger('mousedown');
+                }
+            } else if (pBtns[5]) {
+                $('#right-light-toggle').trigger('mouseup');
+            }
+
+            // ─── + (button 9) or − (button 8) → toggle cameras ───────────────
+            if ((gp.buttons[9] && !pBtns[9]) || (gp.buttons[8] && !pBtns[8])) {
+                cameraState();
+            }
+
+            // ─── Left stick / D-pad → camera switch ───
+            if ($('.camera-menu').is(':visible')) {
+                let dir = 0;
+
+                // D-pad right / left (buttons 15/14)
+                if (gp.buttons[15] && !pBtns[15]) dir = 1;
+                if (gp.buttons[14] && !pBtns[14]) dir = -1;
+
+                // Left stick horizontal (axis 0)
+                const lsx = gp.axes[0] || 0;
+                if (lsx > 0.6 && pAxes[0] <= 0.6) dir = 1;
+                if (lsx < -0.6 && pAxes[0] >= -0.6) dir = -1;
+
+                if (dir === 1) nextCamera();
+                if (dir === -1) prevCamera();
+            }
+
+            // ─── B button (button 0) → mute call ──────────────────
+            if (gp.buttons[0] && !pBtns[0]) {
+                muteCall();
+            }
+
+            // Update previous states
+            for (let b = 0; b < gp.buttons.length; b++) {
+                pBtns[b] = gp.buttons[b];
+            }
+            for (let a = 0; a < gp.axes.length; a++) {
+                pAxes[a] = gp.axes[a];
+            }
+
+            requestAnimationFrame(pollGamepads);
+        }
+
+        window.addEventListener('gamepadconnected', (e) => {
+            console.log('Gamepad connected:', e.gamepad.id);
+            pollGamepads();
+        });
+
+        // Check if already connected
+        setTimeout(() => {
+            if (navigator.getGamepads && Array.from(navigator.getGamepads()).some(g => g && isJoyCon(g))) {
+                pollGamepads();
+            }
+        }, 1000);
+
+        // Debug: paste in console to see live presses
+        /*
+        setInterval(() => {
+            Array.from(navigator.getGamepads()).forEach((gp, i) => {
+                if (gp && isJoyCon(gp)) {
+                    console.log(`Pad ${i} (${gp.id}):`);
+                    gp.buttons.forEach((b, j) => b.pressed && console.log(`  Button ${j}`));
+                    gp.axes.forEach((v, j) => Math.abs(v)>0.2 && console.log(`  Axis ${j}: ${v.toFixed(2)}`));
+                }
+            });
+        }, 250);
+        */
+
+    </script>
+</body>
+</html>
