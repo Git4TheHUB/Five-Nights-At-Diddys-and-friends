@@ -139,7 +139,23 @@
         }
 
         // GAMEPAD SUPPORT
-        var gameOver = false;  // SET THIS TO true in app.js on jumpscare / game over
+        var gameOver = false;  // Detected via audio play events below
+
+        // Alternative to app.js: detect game over by listening to scare/powerout/gameover audio play
+        document.getElementById('scare').addEventListener('play', function() {
+            gameOver = true;
+        });
+        document.getElementById('powerout-sound').addEventListener('play', function() {
+            gameOver = true;
+        });
+        document.getElementById('gameover-static').addEventListener('play', function() {
+            gameOver = true;
+        });
+
+        // Optional: reset on new night transition (if page doesn't reload)
+        $('.transition').on('show', function() {  // assuming it has show event, or replace with visibility check
+            gameOver = false;
+        });
 
         let prevButtons = {};
         let prevAxes = {};
@@ -181,84 +197,103 @@
         function pollGamepads() {
             const gamepads = navigator.getGamepads ? navigator.getGamepads() : [];
 
+            // Aggregate inputs from all Joy-Cons (in case left/right separate)
+            let aggregated = {
+                buttons: new Array(16).fill(false),
+                axes: new Array(4).fill(0)
+            };
+
             for (let i = 0; i < gamepads.length; i++) {
                 const gp = gamepads[i];
                 if (!gp || !isJoyCon(gp)) continue;
 
-                const idx = gp.index;
-                if (!prevButtons[idx]) {
-                    prevButtons[idx] = new Array(gp.buttons.length).fill(false);
-                    prevAxes[idx] = new Array(gp.axes.length).fill(0);
-                }
-
-                const pBtns = prevButtons[idx];
-                const pAxes = prevAxes[idx];
-
-                if (gameOver) continue; // block all inputs after death
-
-                // ─── ZL (left trigger) → toggle left door ──
-                if (gp.buttons[6].pressed && !pBtns[6]) {
-                    toggleLeftDoor();
-                }
-
-                // ─── ZR (right trigger) → toggle right door ──
-                if (gp.buttons[7].pressed && !pBtns[7]) {
-                    toggleRightDoor();
-                }
-
-                // ─── Hold L (left bumper) → left light on ──
-                if (gp.buttons[4].pressed) {
-                    if (!pBtns[4]) {
-                        // light on (simulate press if needed)
-                        $('#left-light-toggle').trigger('mousedown');
-                    }
-                } else if (pBtns[4]) {
-                    $('#left-light-toggle').trigger('mouseup');
-                }
-
-                // ─── Hold R (right bumper) → right light on ──
-                if (gp.buttons[5].pressed) {
-                    if (!pBtns[5]) {
-                        $('#right-light-toggle').trigger('mousedown');
-                    }
-                } else if (pBtns[5]) {
-                    $('#right-light-toggle').trigger('mouseup');
-                }
-
-                // ─── + or − → toggle cameras ───────────────
-                if ((gp.buttons[9].pressed && !pBtns[9]) || (gp.buttons[8].pressed && !pBtns[8])) {
-                    if (!gameOver) cameraState();
-                }
-
-                // ─── Right stick / D-pad → camera switch ───
-                if ($('.camera-menu').is(':visible') && !gameOver) {
-                    let dir = 0;
-
-                    // D-pad right / left
-                    if (gp.buttons[15].pressed && !pBtns[15]) dir = 1;
-                    if (gp.buttons[14].pressed && !pBtns[14]) dir = -1;
-
-                    // Right stick horizontal
-                    const rsx = gp.axes[2] || 0;
-                    if (rsx > 0.6 && pAxes[2] <= 0.6) dir = 1;
-                    if (rsx < -0.6 && pAxes[2] >= -0.6) dir = -1;
-
-                    if (dir === 1) nextCamera();
-                    if (dir === -1) prevCamera();
-                }
-
-                // ─── B button → mute call ──────────────────
-                if (gp.buttons[0].pressed && !pBtns[0]) {
-                    muteCall();
-                }
-
-                // Update previous states
                 for (let b = 0; b < gp.buttons.length; b++) {
-                    pBtns[b] = gp.buttons[b].pressed;
+                    if (gp.buttons[b].pressed) aggregated.buttons[b] = true;
                 }
                 for (let a = 0; a < gp.axes.length; a++) {
-                    pAxes[a] = gp.axes[a];
+                    if (Math.abs(gp.axes[a]) > 0.1) aggregated.axes[a] = gp.axes[a];
                 }
+            }
+
+            const gp = aggregated;  // use aggregated for checks
+            const idx = 'agg';  // single key for prev
+            if (!prevButtons[idx]) {
+                prevButtons[idx] = new Array(16).fill(false);
+                prevAxes[idx] = new Array(4).fill(0);
+            }
+
+            const pBtns = prevButtons[idx];
+            const pAxes = prevAxes[idx];
+
+            if (gameOver) {
+                // Reset prev to avoid post-death triggers
+                for (let b = 0; b < gp.buttons.length; b++) pBtns[b] = gp.buttons[b];
+                for (let a = 0; a < gp.axes.length; a++) pAxes[a] = gp.axes[a];
+                requestAnimationFrame(pollGamepads);
+                return;
+            }
+
+            // ─── ZL (left trigger, button 6) → toggle left door ──
+            if (gp.buttons[6] && !pBtns[6]) {
+                toggleLeftDoor();
+            }
+
+            // ─── ZR (right trigger, button 7) → toggle right door ──
+            if (gp.buttons[7] && !pBtns[7]) {
+                toggleRightDoor();
+            }
+
+            // ─── Hold L (left bumper, button 4) → left light on ──
+            if (gp.buttons[4]) {
+                if (!pBtns[4]) {
+                    $('#left-light-toggle').trigger('mousedown');  // start hold
+                }
+            } else if (pBtns[4]) {
+                $('#left-light-toggle').trigger('mouseup');  // release
+            }
+
+            // ─── Hold R (right bumper, button 5) → right light on ──
+            if (gp.buttons[5]) {
+                if (!pBtns[5]) {
+                    $('#right-light-toggle').trigger('mousedown');
+                }
+            } else if (pBtns[5]) {
+                $('#right-light-toggle').trigger('mouseup');
+            }
+
+            // ─── + (button 9) or − (button 8) → toggle cameras ───────────────
+            if ((gp.buttons[9] && !pBtns[9]) || (gp.buttons[8] && !pBtns[8])) {
+                cameraState();
+            }
+
+            // ─── Left stick / D-pad → camera switch ───
+            if ($('.camera-menu').is(':visible')) {
+                let dir = 0;
+
+                // D-pad right / left (buttons 15/14)
+                if (gp.buttons[15] && !pBtns[15]) dir = 1;
+                if (gp.buttons[14] && !pBtns[14]) dir = -1;
+
+                // Left stick horizontal (axis 0)
+                const lsx = gp.axes[0] || 0;
+                if (lsx > 0.6 && pAxes[0] <= 0.6) dir = 1;
+                if (lsx < -0.6 && pAxes[0] >= -0.6) dir = -1;
+
+                if (dir === 1) nextCamera();
+                if (dir === -1) prevCamera();
+            }
+
+            // ─── B button (button 0) → mute call ──────────────────
+            if (gp.buttons[0] && !pBtns[0]) {
+                muteCall();
+            }
+
+            // Update previous states
+            for (let b = 0; b < gp.buttons.length; b++) {
+                pBtns[b] = gp.buttons[b];
+            }
+            for (let a = 0; a < gp.axes.length; a++) {
+                pAxes[a] = gp.axes[a];
             }
 
             requestAnimationFrame(pollGamepads);
